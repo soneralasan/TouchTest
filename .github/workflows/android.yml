@@ -1,1 +1,41 @@
+name: Android APK Build
 
+# Betiğin ne zaman çalışacağını belirliyoruz (main dalına kod yüklendiğinde)
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Actions sekmesinden manuel tetikleme butonu ekler
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Repodaki kodları bulut sunucusuna çeker
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Android derlemesi için gerekli olan Java ortamını (JDK 17) kurar
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # 3. Gradle aracına çalışma yetkisi verir
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 4. Kodu derleyerek Debug APK oluşturur
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # 5. Oluşan APK dosyasını GitHub paneline "Artifact" olarak yükler
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          # Standart Android projelerinde APK'nın çıktığı varsayılan dizin
+          path: app/build/outputs/apk/debug/app-debug.apk
