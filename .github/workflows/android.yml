@@ -19,9 +19,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          # DİKKAT: 'cache: gradle' satırını sildik
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-disabled: true # GitHub'ın çöken cache sunucularını by-pass ediyoruz
 
       - name: Build Debug APK
         run: gradle :app:assembleDebug
